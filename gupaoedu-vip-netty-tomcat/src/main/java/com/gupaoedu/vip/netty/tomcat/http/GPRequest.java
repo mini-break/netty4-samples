@@ -10,35 +10,36 @@ import java.util.Map;
 
 public class GPRequest {
 
-	private ChannelHandlerContext ctx;
+    private ChannelHandlerContext ctx;
 
-	private HttpRequest req;
+    private HttpRequest req;
 
-	public GPRequest(ChannelHandlerContext ctx, HttpRequest req) {
-		this.ctx = ctx;
-		this.req = req;
-	}
+    public GPRequest(ChannelHandlerContext ctx, HttpRequest req) {
+        this.ctx = ctx;
+        this.req = req;
+    }
 
-	public String getUrl() {
-		return req.uri();
-	}
+    public String getUrl() {
+        return req.uri();
+    }
 
-	public String getMethod() {
-		return req.method().name();
-	}
+    public String getMethod() {
+        return req.method().name();
+    }
 
-	public Map<String, List<String>> getParameters() {
-		QueryStringDecoder decoder = new QueryStringDecoder(req.uri());
-		return decoder.parameters();
-	}
+	// 获取url中的参数
+    public Map<String, List<String>> getParameters() {
+        QueryStringDecoder decoder = new QueryStringDecoder(req.uri());
+        return decoder.parameters();
+    }
 
-	public String getParameter(String name) {
-		Map<String, List<String>> params = getParameters();
-		List<String> param = params.get(name);
-		if (null == param) {
-			return null;
-		} else {
-			return param.get(0);
-		}
-	}
+    public String getParameter(String name) {
+        Map<String, List<String>> params = getParameters();
+        List<String> param = params.get(name);
+        if (null == param) {
+            return null;
+        } else {
+            return param.get(0);
+        }
+    }
 }
