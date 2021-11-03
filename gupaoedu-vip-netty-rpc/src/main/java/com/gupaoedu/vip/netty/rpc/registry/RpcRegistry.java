@@ -15,23 +15,25 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class RpcRegistry {  
-    private int port;  
-    public RpcRegistry(int port){  
-        this.port = port;  
-    }  
-    public void start(){  
-        EventLoopGroup bossGroup = new NioEventLoopGroup();  
-        EventLoopGroup workerGroup = new NioEventLoopGroup();  
-          
-        try {  
+public class RpcRegistry {
+    private int port;
+
+    public RpcRegistry(int port) {
+        this.port = port;
+    }
+
+    public void start() {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
-            		.channel(NioServerSocketChannel.class)  
+                    .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
-  
-                        @Override  
-                        protected void initChannel(SocketChannel ch) throws Exception {  
+
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
                             //自定义协议解码器
                             /** 入参有5个，分别解释如下
@@ -45,25 +47,25 @@ public class RpcRegistry {
 //                            //自定义协议编码器
 //                            pipeline.addLast(new LengthFieldPrepender(4));
                             //对象参数类型编码器
-                            pipeline.addLast("encoder",new ObjectEncoder());
+                            pipeline.addLast("encoder", new ObjectEncoder());
                             //对象参数类型解码器
-                            pipeline.addLast("decoder",new ObjectDecoder(Integer.MAX_VALUE,ClassResolvers.cacheDisabled(null)));
+                            pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
                             pipeline.addLast(new RegistryHandler());
-                        }  
+                        }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 128)       
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);  
-            ChannelFuture future = b.bind(port).sync();      
-            System.out.println("GP RPC Registry start listen at " + port );
-            future.channel().closeFuture().sync();    
-        } catch (Exception e) {  
-             bossGroup.shutdownGracefully();    
-             workerGroup.shutdownGracefully();  
-        }  
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+            ChannelFuture future = b.bind(port).sync();
+            System.out.println("GP RPC Registry start listen at " + port);
+            future.channel().closeFuture().sync();
+        } catch (Exception e) {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
     }
-    
-    
-    public static void main(String[] args) throws Exception {    
-        new RpcRegistry(8080).start();    
-    }    
+
+
+    public static void main(String[] args) throws Exception {
+        new RpcRegistry(8080).start();
+    }
 }  
